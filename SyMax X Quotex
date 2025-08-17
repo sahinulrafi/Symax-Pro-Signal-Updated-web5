@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Market Pulse</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #e94560;
+            font-family: 'Courier New', monospace;
+            margin: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #00d4ff;
+        }
+        .pair-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #16213e;
+            color: #e94560;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+        .pair-btn:hover {
+            background-color: #0f172a;
+            transform: scale(1.1);
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #00ff00;
+            font-weight: bold;
+            min-height: 30px;
+        }
+    </style>
+    <script>
+        function generateSignal(pair) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `Processing ${pair}...`;
+
+            // Random direction with higher chance of Up/Down
+            const directions = ['Up', 'Down', 'Up', 'Down', 'Avoid']; // Up/Down weighted 4:1
+            const direction = directions[Math.floor(Math.random() * directions.length)];
+
+            // Display result
+            resultDiv.innerHTML = `${pair}: ${direction}`;
+
+            // Disable button and set 1-minute timer
+            const button = document.querySelector(`button[onclick="generateSignal('${pair}')"]`);
+            button.disabled = true;
+            button.style.opacity = '0.6';
+
+            setTimeout(() => {
+                resultDiv.innerHTML = '';
+                button.disabled = false;
+                button.style.opacity = '1';
+            }, 60000); // 1 minute = 60000 milliseconds
+        }
+    </script>
+</head>
+<body>
+    <h1>Market Pulse Unlocker</h1>
+    <div>
+        <!-- Forex Pairs -->
+        <h3 style="color: #00d4ff;">Forex</h3>
+        <button class="pair-btn" onclick="generateSignal('EUR/USD (OTC)')">EUR/USD <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('USD/JPY (OTC)')">USD/JPY <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('GBP/USD (OTC)')">GBP/USD <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('AUD/USD (OTC)')">AUD/USD <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('USD/CHF (OTC)')">USD/CHF <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('EUR/JPY (OTC)')">EUR/JPY <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('EUR/GBP (OTC)')">EUR/GBP <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('USD/CAD (OTC)')">USD/CAD <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('NZD/USD (OTC)')">NZD/USD <span style="color: #ffcc00;">(OTC)</span></button>
+
+        <!-- Cryptocurrencies -->
+        <h3 style="color: #00d4ff;">Cryptos</h3>
+        <button class="pair-btn" onclick="generateSignal('BTC/USD (OTC)')">BTC/USD <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('ETH/USD (OTC)')">ETH/USD <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('LTC/USD (OTC)')">LTC/USD <span style="color: #ffcc00;">(OTC)</span></button>
+
+        <!-- Commodities -->
+        <h3 style="color: #00d4ff;">Commodities</h3>
+        <button class="pair-btn" onclick="generateSignal('XAU/USD (OTC)')">XAU/USD <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('XAG/USD (OTC)')">XAG/USD <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('USCrude (OTC)')">USCrude <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('UKBrent (OTC)')">UKBrent <span style="color: #ffcc00;">(OTC)</span></button>
+
+        <!-- Stocks -->
+        <h3 style="color: #00d4ff;">Stocks</h3>
+        <button class="pair-btn" onclick="generateSignal('AAPL (OTC)')">AAPL <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('GOOGL (OTC)')">GOOGL <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('MSFT (OTC)')">MSFT <span style="color: #ffcc00;">(OTC)</span></button>
+        <button class="pair-btn" onclick="generateSignal('AMZN (OTC)')">AMZN <span style="color: #ffcc00;">(OTC)</span></button>
+    </div>
+    <div id="result"></div>
+</body>
+</html>
