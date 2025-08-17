@@ -1,107 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secret Market Pulse</title>
-    <style>
-        body {
-            background-color: #1a1a2e;
-            color: #e94560;
-            font-family: 'Courier New', monospace;
-            margin: 20px;
-            text-align: center;
-        }
-        h1 {
-            font-size: 28px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: #00d4ff;
-        }
-        .pair-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 5px;
-            background-color: #16213e;
-            color: #e94560;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            transition: all 0.3s;
-        }
-        .pair-btn:hover {
-            background-color: #0f172a;
-            transform: scale(1.1);
-        }
-        #result {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #00ff00;
-            font-weight: bold;
-            min-height: 30px;
-        }
-    </style>
-    <script>
-        function generateSignal(pair) {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = `Processing ${pair}...`;
-
-            // Random direction with higher chance of Up/Down
-            const directions = ['Up', 'Down', 'Up', 'Down', 'Avoid']; // Up/Down weighted 4:1
-            const direction = directions[Math.floor(Math.random() * directions.length)];
-
-            // Display result
-            resultDiv.innerHTML = `${pair}: ${direction}`;
-
-            // Disable button and set 1-minute timer
-            const button = document.querySelector(`button[onclick="generateSignal('${pair}')"]`);
-            button.disabled = true;
-            button.style.opacity = '0.6';
-
-            setTimeout(() => {
-                resultDiv.innerHTML = '';
-                button.disabled = false;
-                button.style.opacity = '1';
-            }, 60000); // 1 minute = 60000 milliseconds
-        }
-    </script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Quotex Pair Signal Simulator (Currency + OTC only)</title>
+  <style>
+    body { background:#111; color:#ddd; font-family: monospace; padding:20px; }
+    .pair-btn { display:block; margin:5px 0; padding:8px; background:#222; border:none; color:#ddd; cursor:pointer; width:100%; max-width:300px; text-align:left; }
+    #signal { margin-top:20px; font-size:1.2em; }
+    .up { color:#0f0; }
+    .down { color:#f00; }
+    .avoid { color:#ff0; }
+  </style>
 </head>
 <body>
-    <h1>Market Pulse Unlocker</h1>
-    <div>
-        <!-- Forex Pairs -->
-        <h3 style="color: #00d4ff;">Forex</h3>
-        <button class="pair-btn" onclick="generateSignal('EUR/USD (OTC)')">EUR/USD <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('USD/JPY (OTC)')">USD/JPY <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('GBP/USD (OTC)')">GBP/USD <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('AUD/USD (OTC)')">AUD/USD <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('USD/CHF (OTC)')">USD/CHF <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('EUR/JPY (OTC)')">EUR/JPY <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('EUR/GBP (OTC)')">EUR/GBP <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('USD/CAD (OTC)')">USD/CAD <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('NZD/USD (OTC)')">NZD/USD <span style="color: #ffcc00;">(OTC)</span></button>
+  <h2>Quotex Pair Signal Simulator</h2>
+  <div id="pairs"></div>
 
-        <!-- Cryptocurrencies -->
-        <h3 style="color: #00d4ff;">Cryptos</h3>
-        <button class="pair-btn" onclick="generateSignal('BTC/USD (OTC)')">BTC/USD <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('ETH/USD (OTC)')">ETH/USD <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('LTC/USD (OTC)')">LTC/USD <span style="color: #ffcc00;">(OTC)</span></button>
+  <div id="signal">Select a pair above…</div>
+  <button id="gen" disabled>Generate Direction (1 min lock)</button>
 
-        <!-- Commodities -->
-        <h3 style="color: #00d4ff;">Commodities</h3>
-        <button class="pair-btn" onclick="generateSignal('XAU/USD (OTC)')">XAU/USD <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('XAG/USD (OTC)')">XAG/USD <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('USCrude (OTC)')">USCrude <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('UKBrent (OTC)')">UKBrent <span style="color: #ffcc00;">(OTC)</span></button>
+  <script>
+    // Currency pairs — common majors, minors, a couple exotic
+    const basePairs = [
+      'EURUSD','GBPUSD','USDJPY','USDCHF','AUDUSD','USDCAD','NZDUSD',
+      'EURGBP','EURJPY','GBPJPY','AUDJPY','EURCHF','AUDCAD','NZDJPY'
+    ];
+    const includeOTC = true;
+    const pairs = includeOTC
+      ? basePairs.reduce((a,p) => a.concat(p, p+'-OTC'), [])
+      : basePairs.slice();
 
-        <!-- Stocks -->
-        <h3 style="color: #00d4ff;">Stocks</h3>
-        <button class="pair-btn" onclick="generateSignal('AAPL (OTC)')">AAPL <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('GOOGL (OTC)')">GOOGL <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('MSFT (OTC)')">MSFT <span style="color: #ffcc00;">(OTC)</span></button>
-        <button class="pair-btn" onclick="generateSignal('AMZN (OTC)')">AMZN <span style="color: #ffcc00;">(OTC)</span></button>
-    </div>
-    <div id="result"></div>
+    const container = document.getElementById('pairs');
+    const signalDiv = document.getElementById('signal');
+    const genBtn = document.getElementById('gen');
+    let selected = null;
+    let lockedUntil = 0, timerId = null;
+
+    pairs.forEach(p => {
+      const btn = document.createElement('button');
+      btn.textContent = p;
+      btn.className = 'pair-btn';
+      btn.onclick = () => {
+        selected = p;
+        signalDiv.textContent = `Selected: ${p}`;
+        genBtn.disabled = Date.now() < lockedUntil;
+      };
+      container.appendChild(btn);
+    });
+
+    genBtn.onclick = () => {
+      if (!selected || Date.now() < lockedUntil) return;
+      const r = Math.random();
+      let dirText, dirClass;
+      if (r < 0.45) { dirText = 'UP'; dirClass = 'up'; }
+      else if (r < 0.90) { dirText = 'DOWN'; dirClass = 'down'; }
+      else { dirText = 'AVOID'; dirClass = 'avoid'; }
+
+      signalDiv.innerHTML = `Pair: ${selected} → <span class="${dirClass}">${dirText}</span>`;
+      lockedUntil = Date.now() + 60 * 1000;
+      genBtn.disabled = true;
+
+      if (timerId) clearInterval(timerId);
+      timerId = setInterval(() => {
+        const rem = Math.max(0, lockedUntil - Date.now());
+        const sec = Math.ceil(rem / 1000);
+        if (rem <= 0) {
+          clearInterval(timerId);
+          genBtn.disabled = false;
+          signalDiv.textContent = `Pair: ${selected} → <span class="${dirClass}">${dirText}</span>`;
+        } else {
+          genBtn.textContent = `Wait ${sec}s...`;
+        }
+      }, 200);
+
+      genBtn.textContent = 'Wait 60s...';
+    };
+  </script>
 </body>
 </html>
